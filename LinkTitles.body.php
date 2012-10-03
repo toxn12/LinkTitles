@@ -61,8 +61,9 @@
 			// is retrieved from the database, i.e. also for editing etc.
 			// Therefore we access the global $action variabl to only parse the 
 			// content when the page is viewed.
-			global $action;
-			if ( in_array( $action, array('view', 'render', 'purge') ) ) {
+
+			$actionName = self::getAction();
+			if ( in_array( $actionName, array('view', 'render', 'purge') ) ) {
 				self::parseContent( $article, $content );
 			};
 			return true;
@@ -79,8 +80,7 @@
 			// To prevent adding self-references, we now
 			// extract the current page's title.
 			$myTitle = $article->getTitle()->getText();
-
-			( $wgLinkTitlesPreferShortTitles ) ? $sort_order = 'DESC' : $sort_order = '';
+			( $wgLinkTitlesPreferShortTitles ) ? $sort_order = '' : $sort_order = 'DESC';
 
 			// Build a regular expression that will capture existing wiki links ("[[...]]"),
 			// wiki headings ("= ... =", "== ... ==" etc.),  
@@ -91,11 +91,12 @@
 			// capturing subpattern (which precludes the use of conditional subpatterns).
 			( $wgLinkTitlesParseHeadings ) ? $delimiter = '' : $delimiter = '=+.+?=+|';
 			$urlPattern = '[a-z]+?\:\/\/(?:\S+\.)+\S+(?:\/.*)?';
-			$delimiter = '/(' . $delimiter . '\[\[.*?\]\]|{{[^|]+?}}|{{.+\|{{.+\|||\[' . 
+			$delimiter = '/(' . $delimiter . '\[\[.*?\]\]|\[' . 
 				$urlPattern . '\s.+?\]|'. $urlPattern . '(?=\s|$)|(?<=\b)\S+\@(?:\S+\.)+\S+(?=\b))/i';
 
 			$black_list = str_replace( '_', ' ',
 				'("' . implode( '", "',$wgLinkTitlesBlackList ) . '")' );
+			dump( $black_list );
 
 			// Build an SQL query and fetch all page titles ordered
 			// by length from shortest to longest.
@@ -115,6 +116,7 @@
 			);
 
 			// Iterate through the page titles
+
 			foreach( $res as $row ) {
 				// Page titles are stored in the database with spaces
 				// replaced by underscores. Therefore we now convert
@@ -130,12 +132,24 @@
 					$safeTitle = str_replace( '/', '\/', $title );
 					for ( $i = 0; $i < count( $arr ); $i+=2 ) {
 						// even indexes will point to text that is not enclosed by brackets
-						$arr[$i] = preg_replace( '/(?<![\:\.\@\/\?\&])\b(' . $safeTitle . ')\b/i', '[[$1]]', $arr[$i] );
+						//$arr[$i] = preg_replace( '/(?<![\:\.\@\/\?\&])\b(' . $safeTitle . ')\b/i', '[[$1]]', $arr[$i] );
+						$arr[$i] = preg_replace( '/(?<![\:\.\@\/\?\&])(' . $safeTitle . ')/i', '[[$1]]', $arr[$i] );
+                                                $arr[$i] = preg_replace_callback( "/\<pdf.*\>(.*)\<\/pdf\>/",
+                                                      create_function('$matches', '$rep=str_replace("[","",$matches[0]);return str_replace("]","",$rep);' ), $arr[$i]);
 					};
 					$text = implode( '', $arr );
 				}; // if $title != $myTitle
 			}; // foreach $res as $row
 			return true;
+		}
+		static function getAction(){
+		       global $wgRequest;
+		       $actionName = $wgRequest->getText( 'action' );
+		       if ($actionName == '') {
+		       	  return 'view';
+		       }else{
+			  return $actionName;
+		       }
 		}
 	}
 
