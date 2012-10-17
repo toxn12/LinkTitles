@@ -116,6 +116,10 @@
 			);
 
 			// Iterate through the page titles
+//LiquidThreadsの表示がタイムアウトする不具合の対応
+if (preg_match('/トーク:/', $myTitle)) {
+   return true;
+}
 
 			foreach( $res as $row ) {
 				// Page titles are stored in the database with spaces
@@ -129,7 +133,7 @@
 					// see http://stackoverflow.com/questions/10672286
 					$arr = preg_split( $delimiter, $text, -1, PREG_SPLIT_DELIM_CAPTURE );
 					// dump( $arr );
-					$safeTitle = str_replace( '/', '\/', $title );
+					$safeTitle = preg_quote($title, '/' );
 					for ( $i = 0; $i < count( $arr ); $i+=2 ) {
 						// even indexes will point to text that is not enclosed by brackets
 						//$arr[$i] = preg_replace( '/(?<![\:\.\@\/\?\&])\b(' . $safeTitle . ')\b/i', '[[$1]]', $arr[$i] );
