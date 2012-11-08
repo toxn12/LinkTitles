@@ -102,7 +102,7 @@
 			$urlPattern = '[a-z]+?\:\/\/(?:\S+\.)+\S+(?:\/.*)?';
 			$delimiter = '/(' . $delimiter . '\[\[.*?\]\]|' . $templatesDelimiter . 
 			  '|\[' . $urlPattern . '\s.+?\]|'. $urlPattern . 
-			  '(?=\s|$)|(?<=\b)\S+\@(?:\S+\.)+\S+(?=\b))/im';
+			  '(?=\s|$)|(?<=\b)\S+\@(?:\S+\.)+\S+(?=\b))/i';
 
 			$black_list = str_replace( '_', ' ',
 				'("' . implode( '", "',$wgLinkTitlesBlackList ) . '")' );
