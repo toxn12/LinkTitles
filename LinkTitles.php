@@ -25,7 +25,7 @@
 
 	/*
 		error_reporting(E_ALL);
-		ini_set('display_errors', 'Off');
+		ini_set('display_errors', 'On');
 		ini_set('error_log', 'php://stderr');
 		$wgMainCacheType = CACHE_NONE;
 		$wgCacheDirectory = false;
@@ -37,6 +37,7 @@
 	$wgLinkTitlesParseHeadings = false;
 	$wgLinkTitlesParseOnEdit = true;
 	$wgLinkTitlesParseOnRender = false;
+	$wgLinkTitlesSkipTemplates = false;
 	$wgLinkTitlesBlackList = array();
 
   $wgExtensionCredits['parserhook'][] = array(
@@ -44,7 +45,7 @@
     'name'           => 'LinkTitles',
     'author'         => '[http://www.mediawiki.org/wiki/User:Bovender Daniel Kraus]', 
     'url'            => 'http://www.mediawiki.org/wiki/Extension:LinkTitles',
-    'version'        => '1.3.0',
+    'version'        => '1.4.0',
     'descriptionmsg' => 'linktitles-desc'
     );
 

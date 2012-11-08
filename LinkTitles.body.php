@@ -76,11 +76,20 @@
 			global $wgLinkTitlesMinimumTitleLength;
 			global $wgLinkTitlesParseHeadings;
 			global $wgLinkTitlesBlackList;
+			global $wgLinkTitlesSkipTemplates;
 
 			// To prevent adding self-references, we now
 			// extract the current page's title.
 			$myTitle = $article->getTitle()->getText();
+
 			( $wgLinkTitlesPreferShortTitles ) ? $sort_order = '' : $sort_order = 'DESC';
+
+			if ( $wgLinkTitlesSkipTemplates )
+			  {
+			    $templatesDelimiter = '{{.+}}';
+			  } else {
+			  $templatesDelimiter = '{{[^|]+?}}|{{.+\|.+}}|^\|.+=.+';
+			};
 
 			// Build a regular expression that will capture existing wiki links ("[[...]]"),
 			// wiki headings ("= ... =", "== ... ==" etc.),  
@@ -91,12 +100,12 @@
 			// capturing subpattern (which precludes the use of conditional subpatterns).
 			( $wgLinkTitlesParseHeadings ) ? $delimiter = '' : $delimiter = '=+.+?=+|';
 			$urlPattern = '[a-z]+?\:\/\/(?:\S+\.)+\S+(?:\/.*)?';
-			$delimiter = '/(' . $delimiter . '\[\[.*?\]\]|\[' . 
-				$urlPattern . '\s.+?\]|'. $urlPattern . '(?=\s|$)|(?<=\b)\S+\@(?:\S+\.)+\S+(?=\b))/i';
+			$delimiter = '/(' . $delimiter . '\[\[.*?\]\]|' . $templatesDelimiter . 
+			  '|\[' . $urlPattern . '\s.+?\]|'. $urlPattern . 
+			  '(?=\s|$)|(?<=\b)\S+\@(?:\S+\.)+\S+(?=\b))/im';
 
 			$black_list = str_replace( '_', ' ',
 				'("' . implode( '", "',$wgLinkTitlesBlackList ) . '")' );
-			dump( $black_list );
 
 			// Build an SQL query and fetch all page titles ordered
 			// by length from shortest to longest.
