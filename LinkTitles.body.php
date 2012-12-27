@@ -97,7 +97,7 @@
 
 			$black_list = str_replace( '_', ' ',
 				'("' . implode( '", "',$wgLinkTitlesBlackList ) . '")' );
-			dump( $black_list );
+			//dump( $black_list );
 
 			// Build an SQL query and fetch all page titles ordered
 			// by length from shortest to longest.
@@ -141,7 +141,11 @@
 						//$arr[$i] = preg_replace( '/(?<![\:\.\@\/\?\&])\b(' . $safeTitle . ')\b/i', '[[$1]]', $arr[$i] );
 						$arr[$i] = preg_replace( '/(?<![\:\.\@\/\?\&])(' . $safeTitle . ')/i', '[[$1]]', $arr[$i] );
                                                 $arr[$i] = preg_replace_callback( "/\<pdf.*\>(.*)\<\/pdf\>/",
-                                                      create_function('$matches', '$rep=str_replace("[","",$matches[0]);return str_replace("]","",$rep);' ), $arr[$i]);
+                                                      					function($matches){
+												$rep=str_replace("[","",$matches[0]);
+												return str_replace("]","",$rep);
+											}, 
+											$arr[$i]);
 					};
 					$text = implode( '', $arr );
 				}; // if $title != $myTitle
